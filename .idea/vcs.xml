@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo1/base-aws-eks-image" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo2/g-autos" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo3/g-autos-from-git-lab" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo4/g-hello" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo5/hello" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo6/Hello-K8s" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo7/mildlyoverfitted" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo8/my-first-gitlab-project" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repo9/nlp-api" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/reposit1/sample-apps-caas" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/reposit2/vk-node-stack" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/reposit3/simple-autos" vcs="Git" />
+  </component>
+</project>
