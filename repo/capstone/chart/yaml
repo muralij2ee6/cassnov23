@@ -1,0 +1,4 @@
+apiVersion: v2
+name: flask-ml-app
+description: A Helm chart for deploying Flask app with ML model
+version: 0.1.0
