@@ -1,0 +1,45 @@
+version: '3'
+services:
+    animal_shelter_db:
+        image: animal-shelter-db:psql
+        container_name: shelter_db
+        ports:
+            - "5432:5432"
+        volumes:
+            - psql_db:/var/lib/postgresql/data     
+    shelter:
+        image: rlwingjr/animal-shelter:java
+        container_name: shelter_api       
+        environment:
+            - USE_DATABASE=TRUE
+            - DB_TYPE=psql
+            - DB_PORT=5432
+            - DB_NAME=animal_shelter
+            - DB_USER=shelter
+            - DB_PWD=shelter
+        ports:
+            - "8080:8080"
+        depends_on:
+            - animal_shelter_db
+       
+volumes:
+  psql_db:
+    driver: local
+ 
+
+
+
+    
+    
+    
+    
+
+         
+        
+
+
+
+    
+    
+    
+    

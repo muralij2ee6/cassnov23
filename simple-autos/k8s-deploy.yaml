@@ -1,0 +1,79 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mk-simple-autos
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mk-simple-autos
+  template:
+    metadata:
+      labels:
+        app: mk-simple-autos
+    spec:
+      imagePullSecrets:
+        - name: simple-autos-deploy-token
+      containers:
+        - image: $IMAGE
+          name: mk-simple-autos
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mk-config
+                  key: DB_HOST
+                  optional: false
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mk-config
+                  key: DB_PORT
+                  optional: false
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: mk-config
+                  key: DB_NAME
+                  optional: false
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: mk-config
+                  key: DB_USER
+                  optional: false
+            - name: DB_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: automobiles-db
+                  key: password
+                  optional: false
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+            requests:
+              cpu: "0.5"
+              memory: 256Mi
+
+---
+# Service LoadBalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: mk-simple-autos
+  namespace: default
+spec:
+  type: LoadBalancer
+  selector:
+    app: mk-simple-autos
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      name: http

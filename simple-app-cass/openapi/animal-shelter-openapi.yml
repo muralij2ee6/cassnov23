@@ -1,0 +1,57 @@
+openapi: '3.0.2'
+info:
+  title: Animal-Shelter
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+
+components:
+  schemas:
+    animal:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        type:
+          description: Type of animal 
+          enum:
+            - DOG
+            - CAT
+            - BIRD
+            - RABBIT
+            - HORSE 
+        description:
+          type: string
+        birthdate:
+          type: string
+          format: date
+paths:
+  /animals:
+    get:
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/animal'
+    post:
+      description: 'Add a new animal'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/animal'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/animal'
+          

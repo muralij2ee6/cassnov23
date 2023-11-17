@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: animal-shelter
+data:
+  application.properties: |-
+    spring.profiles.active: test
+    ROB-TESTING: true

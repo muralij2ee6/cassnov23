@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-cicd-react-app
+  namespace: default
+  labels:
+    app: vk-cicd-react-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vk-cicd-react-app
+  template:
+    metadata:
+      labels:
+        app: vk-cicd-react-app
+    spec:
+      imagePullSecrets:
+        - name: node-stack-deploy-token
+      containers:
+        - name: vk-cicd-react-app 
+          image: $REACT_IMAGE
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            limits: 
+              cpu: '1'
+              memory: '512Mi'
+            requests:
+              cpu: '500m'
+              memory: '256Mi'
+
+---
+# Service LoadBalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: vk-cicd-react-app
+  namespace: default
+  labels:
+    app: vk-cicd-react-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: vk-cicd-react-app 
+  ports:
+    - name: 'http'
+      port: 3000
+      targetPort: 3000

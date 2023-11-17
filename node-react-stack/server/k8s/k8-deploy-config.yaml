@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-node-app
+  labels:
+    app: vk-node-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vk-node-app
+  template:
+    metadata:
+      labels:
+        app: vk-node-app
+    spec:
+      containers:
+        - name: vk-node-app 
+          image: vkuma076/vk-node-app:04
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vk-node-secret
+                  key: db-password
+                  optional: false
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: vk-node-app
+                  key: DB_HOST
+                  optional: false
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: vk-node-app
+                  key: DB_PORT
+                  optional: false
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: vk-node-app
+                  key: DB_NAME
+                  optional: false
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: vk-node-app
+                  key: DB_USER
+                  optional: false
+          resources:
+            limits: 
+              cpu: '1'
+              memory: '512Mi'
+            requests:
+              cpu: '500m'
+              memory: '256Mi'

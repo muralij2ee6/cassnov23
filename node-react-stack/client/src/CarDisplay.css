@@ -1,0 +1,49 @@
+.car-container {
+    display: grid;
+    /* Define three columns; each column takes up 1 fraction of the available space */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 20px; /* Space between grid items */
+    padding: 20px; /* Padding around the grid container */
+    
+    /* Optional: Adjust the layout on smaller screens */
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr); /* Two columns for medium-sized screens */
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr; /* Single column for small screens */
+    }
+}
+
+.car-card {
+    background-color: rgba(0, 0, 0, 0.75); /* Slightly lighter black for better readability */
+    color: white;
+    border-radius: 12px; /* More rounded for a modern look */
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Better internal spacing */
+}
+
+.car-card:hover {
+    transform: translateY(-3px); /* Less pronounced hover effect */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.car-card h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.car-card p {
+    margin: 5px 0;
+    line-height: 1.4; /* Improved line height for readability */
+}
+
+@media (max-width: 600px) {
+    .car-card {
+        padding: 10px; /* Adjust padding for smaller screens */
+    }
+}

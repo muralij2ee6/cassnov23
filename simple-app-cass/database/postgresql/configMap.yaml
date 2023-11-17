@@ -1,0 +1,10 @@
+apiVersion : v1
+kind : ConfigMap
+metadata:
+  # The name of the configmap on the cluster
+  name : db-config
+# Attributes
+data:
+  host : mysql
+  dbName: animal_shelter
+  dbPort: "3306"

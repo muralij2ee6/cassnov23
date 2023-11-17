@@ -1,0 +1,68 @@
+
+image: eclipse-temurin:11
+before_script:
+  - GRADLE_USER_HOME="$(pwd)/.gradle"
+  - export GRADLE_USER_HOME
+stages:
+  - build
+  - test
+  - docker
+  - deploy
+build:
+  stage: build
+  script: ./gradlew bootJar
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: push
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    paths:
+      - build/classes/java/
+      - build/libs/*SNAPSHOT.jar
+    expire_in: 30 days
+test:
+  stage: test
+  script: ./gradlew test
+  dependencies:
+    - build
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    paths:
+      - build/test-results/test/TEST*.xml
+docker:
+  stage: docker
+  needs:
+    - build
+    - test
+  image:
+    name: gcr.io/kaniko-project/executor:v1.15.0-debug
+    entrypoint:
+      - ""
+  script:
+    - /kaniko/executor --context "${CI_PROJECT_DIR}" --dockerfile
+      "${CI_PROJECT_DIR}/Dockerfile" --destination
+      "${CI_REGISTRY_IMAGE}:$CI_PIPELINE_IID" --destination
+      "${CI_REGISTRY_IMAGE}:latest" --cleanup
+AWSdeploy:
+  stage: deploy
+  image: registry.gitlab.galvanize.com/galvanize-it/curricula/delivery/enterprise/sf/cse-caas-november-2023/instructor-code/base-aws-eks-image:latest
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+  before_script:
+    - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
+    - aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+    - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+    - aws configure set region us-west-2
+    - aws configure set output json
+    - aws sts get-caller-identity
+    - aws eks update-kubeconfig --name "$CLUSTER_NAME" --region "us-west-2"
+  script:
+    - envsubst < k8s-deploy.yaml | kubectl apply -f -

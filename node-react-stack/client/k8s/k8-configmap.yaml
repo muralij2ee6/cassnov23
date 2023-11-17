@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vk-react-app
+data:
+  REACT_APP_HOST: 'ab248004ec3de489982dd04f202ecee1-1468073154.us-west-2.elb.amazonaws.com'
+  REACT_APP_PORT: '8080'

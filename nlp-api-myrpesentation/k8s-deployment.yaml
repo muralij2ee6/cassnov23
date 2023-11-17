@@ -1,0 +1,48 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nlp-api
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nlp-api
+  template:
+    metadata:
+      labels:
+        app: nlp-api
+    spec:
+      imagePullSecrets:
+        - name: simple-autos-deploy-token
+      containers:
+        - image: https://gitlab.galvanize.com/galvanize-it/curricula/delivery/enterprise/sf/cse-caas-november-2023/student-work/murali-venigalla/nlp-api/container_registry
+          name: nlp-api
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+            requests:
+              cpu: "0.5"
+              memory: 256Mi
+
+---
+# Service LoadBalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: nlp-api
+  namespace: default
+spec:
+  type: LoadBalancer
+  selector:
+    app: nlp-api
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      name: http

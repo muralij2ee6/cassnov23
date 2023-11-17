@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-react-app
+  labels:
+    app: vk-react-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vk-react-app
+  template:
+    metadata:
+      labels:
+        app: vk-react-app
+    spec:
+      containers:
+        - name: vk-react-app 
+          image: vkuma076/vk-react-app:01
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            limits: 
+              cpu: '1'
+              memory: '512Mi'
+            requests:
+              cpu: '500m'
+              memory: '256Mi'

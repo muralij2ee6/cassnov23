@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: animal-shelter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: animal-shelter
+  template:
+    metadata:
+      labels:
+        app: animal-shelter
+    spec:
+      containers:
+        - image: rlwingjr/animal-shelter:java
+          name: animal-shelter
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: password
+                  optional: false
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: username
+                  optional: false
+            - name: DB_NAME 
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: dbName
+                  optional: false
+            - name: DB_PORT 
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: dbPort
+                  optional: false
+            - name: DB_HOST 
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: host
+                  optional: false
+            # - name: spring.profiles.active
+            #   valueFrom:
+            #     configMapKeyRef:
+            #       name: animal-shelter
+            #       key: spring.profiles.active 
+            #       optional: false
+            

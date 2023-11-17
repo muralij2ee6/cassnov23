@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nlp-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nlp-api
+  template:
+    metadata:
+      labels:
+        app: nlp-api
+    spec:
+      imagePullSecrets: # Be sure the token name matches what you created on K8s
+        - name: nlp-api-deploy-token-mk
+      containers:
+        - image: registry.gitlab.galvanize.com/galvanize-it/curricula/delivery/enterprise/sf/cse-caas-november-2023/student-work/murali-venigalla/nlp-api
+          name: nlp-api
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          

@@ -1,0 +1,42 @@
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-image: url('../public/bg.png'); /* Replace with your image URL */
+  background-size: cover;
+  background-position: center;
+}
+
+.App-header {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  color: white;
+}
+
+.App-logo {
+  height: 80px;
+}
+
+main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}

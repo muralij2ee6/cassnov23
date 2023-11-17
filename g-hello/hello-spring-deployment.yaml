@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mk-hello-spring
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mk-hello-spring
+  template:
+    metadata:
+      labels:
+        app: mk-hello-spring
+    spec:
+      containers:
+        - image: muralij2ee/hello-spring:k8s
+          name: mk-hello-spring
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080

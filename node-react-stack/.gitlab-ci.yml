@@ -1,0 +1,155 @@
+image: node:18-alpine
+
+# Pick zero or more services to be used on all builds.
+# Only needed when using a docker container to run your tests in.
+# Check out: https://docs.gitlab.com/ee/ci/services/index.html
+services:
+  - postgres:latest
+
+# This folder is cached between builds
+# https://docs.gitlab.com/ee/ci/yaml/index.html#cache
+cache:
+  paths:
+    - node_modules/
+
+# before_script:
+#   - CI=false npm install
+
+stages:
+  - build
+  - test
+  - docker
+  - deploy 
+
+# BUILD  -------------------------------------------
+
+build_node_dep:
+  stage: build
+  image: node:18-alpine
+  script:
+    - echo "Start Building Node App"
+    # - npm install
+    - cd server
+    - npm install
+    # - CI=false npm run start
+    - echo "Build successfully!"
+  artifacts:
+    untracked: false
+    when: on_success
+    expire_in: "30 days"
+    paths:
+      - server/node_modules/
+
+build_react_dep:
+  stage: build
+  image: node:18-alpine
+  script:
+    - echo "Start Building react App"
+    # - npm install
+    - cd client
+    - npm install --progress=false
+    - npm run build
+    # - CI=false npm run start
+    - echo "Build successfully!"
+  artifacts:
+    untracked: false
+    when: on_success
+    expire_in: "30 days"
+    paths:
+      - client/node_modules/
+
+
+# TEST  -------------------------------------------
+
+node_test:
+  stage: test
+  script:
+    - echo "Cause why not? i guess... fuk me"
+  dependencies:
+    - build_node_dep
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - server/test
+  artifacts:
+    paths:
+      - server/test
+
+react_test:
+  stage: test
+  script:
+    - echo "Run test script"
+    # - cd client
+    # - npm test
+  dependencies:
+    - build_react_dep
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - client/test
+  artifacts:
+    paths:
+      - client/test
+  
+# DOCKER -------------------------------------------
+
+docker_node:
+  stage: docker
+  needs:
+    - build_node_dep
+    - node_test
+  image:
+    name: gcr.io/kaniko-project/executor:v1.15.0-debug
+    entrypoint: [""]
+  script:
+    - echo "${CI_PROJECT_DIR}"
+    - echo "${CI_PROJECT_DIR}/server/Dockerfile"
+    - echo "${CI_REGISTRY_IMAGE}:$CI_PIPELINE_IID"
+    - echo "${CI_REGISTRY_IMAGE}:04"
+    # - cd ${CI_PROJECT_DIR}/server
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}/server"
+      --dockerfile "${CI_PROJECT_DIR}/server/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}:node-$CI_PIPELINE_IID"
+      --destination "${CI_REGISTRY_IMAGE}:node-latest"
+
+docker_react:
+  stage: docker
+  needs:
+    - build_react_dep
+    - react_test
+  image:
+    name: gcr.io/kaniko-project/executor:v1.15.0-debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}/client"
+      --dockerfile "${CI_PROJECT_DIR}/client/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}:react-$CI_PIPELINE_IID"
+      --destination "${CI_REGISTRY_IMAGE}:react-latest"
+
+
+# DEPLOY  -------------------------------------------
+
+AWSdeploy:
+  stage: deploy
+  image: registry.gitlab.galvanize.com/galvanize-it/curricula/delivery/enterprise/sf/cse-caas-november-2023/instructor-code/base-aws-eks-image:latest
+  allow_failure: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  before_script:
+    - export NODE_IMAGE="$CI_REGISTRY_IMAGE:node-$CI_PIPELINE_IID"
+    - export REACT_IMAGE="$CI_REGISTRY_IMAGE:react-$CI_PIPELINE_IID"
+    - aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+    - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+    - aws configure set region us-west-2
+    - aws configure set output json
+    - aws sts get-caller-identity
+    - aws eks update-kubeconfig --name "$CLUSTER_NAME" --region "us-west-2"
+    
+  script:
+    - echo $PWD
+    - envsubst < k8-CICD-node-deploy.yaml | kubectl apply -f -
+    - envsubst < k8-CICD-react-deploy.yaml | kubectl apply -f -

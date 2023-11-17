@@ -1,0 +1,47 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.0'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+group = 'com.galvanize'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+jar {
+	enabled = true
+}
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+ext {
+	set('springCloudVersion', "2021.0.3-SNAPSHOT")
+	set('log4j2.version', '2.19.0')
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testRuntimeOnly 'com.h2database:h2'
+	// runtimeOnly 'mysql:mysql-connector-java'
+	implementation 'org.postgresql:postgresql:42.3.6'
+	// Include ALL of the Kubernetes for Spring cloud.
+	implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-fabric8-all'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+	imports {
+		// Imports the proper dependencies for your spring cloud version
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+test {
+	useJUnitPlatform()
+}

@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vk-cicd-node-app
+  namespace: default
+  labels:
+    app: vk-cicd-node-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vk-cicd-node-app
+  template:
+    metadata:
+      labels:
+        app: vk-cicd-node-app
+    spec:
+      imagePullSecrets:
+        - name: node-stack-deploy-token
+      containers:
+        - name: vk-cicd-node-app 
+          image: $NODE_IMAGE
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vk-node-secret
+                  key: db-password
+                  optional: false
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: vk-node-app
+                  key: DB_HOST
+                  optional: false
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: vk-node-app
+                  key: DB_PORT
+                  optional: false
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: vk-node-app
+                  key: DB_NAME
+                  optional: false
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: vk-node-app
+                  key: DB_USER
+                  optional: false
+          resources:
+            limits: 
+              cpu: '1'
+              memory: '512Mi'
+            requests:
+              cpu: '500m'
+              memory: '256Mi'
+
+---
+# Service LoadBalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: vk-cicd-node-app
+  namespace: default
+  labels:
+    app: vk-cicd-node-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: vk-cicd-node-app 
+  ports:
+    - name: 'http'
+      port: 8080
+      targetPort: 8080

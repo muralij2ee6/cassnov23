@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vk-node-app
+  labels:
+    app: vk-node-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: vk-node-app 
+  ports:
+    - name: 'http'
+      port: 8080
+      targetPort: 8080
